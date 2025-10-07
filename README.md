@@ -13,7 +13,8 @@ Iniciar la API
 Desde la terminal ejecutar:
 
 py -m flask --app CarreraAPI run
-Si la conexión es exitosa, se muestra un mensaje como:
+
+Pide usuario y contraseña, si la conexión es exitosa se muestra un mensaje como:
 
 ✅ Conexión exitosa a MySQL
  * Running on http://127.0.0.1:5000
