@@ -9,7 +9,8 @@ pip install requests
 
 Ejecución del Proyecto
 ---------------------
-Iniciar la API
+Instalar base de datos usando Script.sql
+
 Desde la terminal ejecutar:
 
 py -m flask --app CarreraAPI run
