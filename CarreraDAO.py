@@ -1,3 +1,5 @@
+from Carrera import Carrera
+
 class CarreraDAO:
     def __init__(self, cursor, db):
         self.cursor = cursor
@@ -8,11 +10,12 @@ class CarreraDAO:
         val = (carrera.get_nombre(),)
         self.cursor.execute(sql, val)
         self.db.commit()
-        print(f"Carrera '{carrera.get_nombre()}' insertada correctamente.")
+        return carrera
 
     def see_all(self):
         self.cursor.execute("SELECT * FROM carrera")
-        return self.cursor.fetchall()
+        rows = self.cursor.fetchall()
+        return [Carrera(nombre=row[1]) for row in rows]
 
     def update(self, carrera, nuevo_nombre):
         sql = "UPDATE carrera SET nombre = %s WHERE nombre = %s"
@@ -21,10 +24,11 @@ class CarreraDAO:
         self.db.commit()
         print(f"Carrera '{carrera.get_nombre()}' actualizada a '{nuevo_nombre}'.")
         carrera.set_nombre(nuevo_nombre)
+        return carrera
 
     def delete(self, carrera):
         sql = "DELETE FROM carrera WHERE nombre = %s"
         val = (carrera.get_nombre(),)
         self.cursor.execute(sql, val)
         self.db.commit()
-        print(f"Carrera '{carrera.get_nombre()}' eliminada.")
+        return carrera

@@ -1,28 +1,8 @@
 from Carrera import Carrera
 from CarreraDAO import CarreraDAO
 import mysql.connector
+import requests as req
 
-try:
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        database="universidad",
-        password="super3",
-        ssl_disabled=True
-    )
-    print("✅ Conexión exitosa.")
-
-except Exception as e:
-    print("❌ Error de conexión a MySQL:", e)
-
-print("2")
-
-mycursor = mydb.cursor()
-mycursor.execute("SELECT * FROM carrera")
-myresult = mycursor.fetchall()
-print(myresult)
-
-dao = CarreraDAO(mycursor, mydb)
 
 def main():
     while True:
@@ -35,50 +15,64 @@ def main():
         opcion = input("Selecciona una opción: ")
 
         if opcion == "1":
-            nuevaCarrera = Carrera(input("Introduce el nombre de la carrera que quieres crear: "))
-            dao.insert(nuevaCarrera)
+            nombre = input("Escribe el nombre para añadir carrera: ")
+            print("Añadiendo carrera...")
+            datos = {'nombre': nombre,}
+            resp = req.post('http://localhost:5000/carreras', json=datos)
+            print(resp.json()["message"])
 
         elif opcion == "2":
-            carreras = [Carrera(c[1]) for c in dao.see_all()]
-            if not carreras:
-                print("No hay carreras registradas.")
-                continue
+            print("Obteniendo carreras...")
+
+            res = req.get("http://localhost:5000/carreras",)
+            carreras = res.json()
+
             print("Carreras disponibles:")
             for i, c in enumerate(carreras):
-                print(f"{i+1}. {c.get_nombre()}")
-
+                print(f'{i+1}. {c["nombre"]}')
+            
             seleccion = int(input("Selecciona el número de la carrera a actualizar: "))
             if seleccion > len(carreras) or seleccion < 1:
                 print("Numero invalido")
             else:
                 carrera_seleccionada = carreras[seleccion - 1]
                 nuevo_nombre = input("Escribe el nuevo nombre: ")
-                dao.update(carrera_seleccionada, nuevo_nombre)
+                datos = {
+                    "nombre_actual": carrera_seleccionada["nombre"],
+                    "nuevo_nombre": nuevo_nombre
+                }
+                resp = req.patch("http://localhost:5000/carreras", json=datos)
+                print(resp.json()["message"])
 
         elif opcion == "3":
-            carreras = [Carrera(c[1]) for c in dao.see_all()]
-            if not carreras:
-                print("No hay carreras registradas.")
-                continue
-            print("Carreras disponibles:")
+            print("Obteniendo carreras...")
+            res = req.get("http://localhost:5000/carreras")
+            carreras = res.json()
+
             for i, c in enumerate(carreras):
-                print(f'{i+1}. {c.get_nombre()}')
+                print(f'{i+1}. {c["nombre"]}')
 
         elif opcion == "4":
-            carreras = [Carrera(c[1]) for c in dao.see_all()]
-            if not carreras:
-                print("No hay carreras registradas.")
-                continue
+            print("Obteniendo carreras...")
+
+            res = req.get("http://localhost:5000/carreras",)
+            carreras = res.json()
+
             print("Carreras disponibles:")
             for i, c in enumerate(carreras):
-                print(f"{i+1}. {c.get_nombre()}")
-
+                print(f'{i+1}. {c["nombre"]}')
+            
             seleccion = int(input("Selecciona el número de la carrera para borrar: "))
             if seleccion > len(carreras) or seleccion < 1:
                 print("Numero invalido")
             else:
                 carrera_seleccionada = carreras[seleccion - 1]
-                dao.delete(carrera_seleccionada)
+                datos = {
+                    "nombre_actual": carrera_seleccionada["nombre"],
+                }
+                resp = req.delete("http://localhost:5000/carreras", json=datos)
+                print(resp.json()["message"])
+        
         elif opcion == "5":
             print("Saliendo del programa...")
             break
